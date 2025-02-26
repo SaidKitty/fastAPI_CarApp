@@ -24,7 +24,7 @@ class CarInput(BaseModel):
     segment: str
 
 @app.post("/predict")
-async def predict_price(features: CarFeatures):
+async def predict_price(features: CarInput):
     input_data = pd.DataFrame([features.dict()])
 
     # Rename columns to match the trained model
