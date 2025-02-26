@@ -48,5 +48,5 @@ async def predict_price(features: CarInput):
     # Pass the correctly formatted data to the model
     prediction = model.predict(input_encoded)
     
- return {"predicted_price": float(prediction[0])}
+    return {"predicted_price": float(prediction[0])}
 
