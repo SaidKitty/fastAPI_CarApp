@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import pandas as pd
 import joblib
 from pydantic import BaseModel
+from typing import List
 
 app = FastAPI()
 
