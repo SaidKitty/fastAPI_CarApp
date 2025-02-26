@@ -24,14 +24,28 @@ class CarInput(BaseModel):
     segment: str
 
 @app.post("/predict")
-def predict_price(data: CarInput):
-    # Convert input data to DataFrame
-    input_data = pd.DataFrame([data.dict()])
+async def predict_price(features: CarFeatures):
+    input_data = pd.DataFrame([features.dict()])
+
+    # Rename columns to match the trained model
+    input_data.rename(columns={
+        "mileage": "mileage(kilometers)",
+        "volume": "volume(cm3)"
+    }, inplace=True)
+
+    # Ensure all expected columns exist
+    expected_columns = ['make', 'model', 'year', 'condition', 'mileage(kilometers)', 
+                        'fuel_type', 'volume(cm3)', 'color', 'transmission', 
+                        'drive_unit', 'segment']
     
-    # Encode categorical features
-    input_encoded = encoder.transform(input_data)
+    missing_cols = [col for col in expected_columns if col not in input_data.columns]
+    if missing_cols:
+        return {"error": f"Missing columns: {missing_cols}"}
+
+    # Apply the trained encoder
+    input_encoded = encoder.transform(input_data)  # Ensure `encoder` is loaded correctly
+
+    # Pass the correctly formatted data to the model
+    prediction = model.predict(input_encoded)
     
-    # Predict price
-    prediction = model.predict(input_encoded)[0]
-    
-    return {"predicted_price": round(prediction, 2)}
+    return {"predicted_price": prediction[0]}
