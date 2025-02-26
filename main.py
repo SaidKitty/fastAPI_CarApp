@@ -24,8 +24,8 @@ class CarInput(BaseModel):
     segment: str
 
 @app.post("/predict")
-async def predict_price(features: CarInput):
-    input_data = pd.DataFrame([features.dict()])
+async def predict_price(features: List[CarInput]):
+    input_data = pd.DataFrame([item.dict() for item in features])
 
     # Rename columns to match the trained model
     input_data.rename(columns={
@@ -46,7 +46,7 @@ async def predict_price(features: CarInput):
     input_encoded = encoder.transform(input_data)  # Ensure `encoder` is loaded correctly
 
     # Pass the correctly formatted data to the model
-    prediction = model.predict(input_encoded)
+    predictions = model.predict(input_encoded)
     
-    return {"predicted_price": float(prediction[0])}
+    return {"predicted_prices": predictions.tolist()}
 
